@@ -61,5 +61,3 @@ if __name__ == '__main__':
 
     torch.save(train, "data/processed/traindata.pt")
     torch.save(test, "data/processed/testdata.pt")
-
-    pass

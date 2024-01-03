@@ -22,6 +22,10 @@ def train(lr):
     # TODO: Implement training loop here
     model = MyAwesomeModel()
     train_set, _ = mnist()
+    print(train_set[0].shape)
+
+    train_set2 = torch.load('data/processed/traindata.pt')
+    print(train_set2[0].shape)
 
     model.training_loop(lr, train_set)
     

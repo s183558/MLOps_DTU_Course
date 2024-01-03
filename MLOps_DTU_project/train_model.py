@@ -13,7 +13,7 @@ class MyAwesomeModel(nn.Module):
         self.cnn1 = nn.Conv2d(1, 32, 3)  # [B, 1, 28, 28] -> [B, 32, 26, 26]
         self.cnn2 = nn.Conv2d(32, 64, 3) # [B, 32, 26, 26] -> [B, 64, 24, 24]
         self.maxpool2d = nn.MaxPool2d(2)      # [B, 64, 24, 24] -> [B, 64, 12, 12]
-        self.flatten = nn.Flatten()        # [B, 64, 12, 12] -> [B, 64 * 12 * 12]
+        self.flatten = nn.Flatten(0, -1)        # [B, 64, 12, 12] -> [B, 64 * 12 * 12]
         self.fc = nn.Linear(64 * 12 * 12, 10)
 
         self.LRelu = nn.LeakyReLU()
@@ -23,9 +23,8 @@ class MyAwesomeModel(nn.Module):
         x = self.LRelu(self.cnn1(x))
         x = self.LRelu(self.cnn2(x))
         x = self.maxpool2d(x)
-        x = x.view(x.shape[0], -1) # flatten
-        # x = self.flatten(x)
-        x = F.log_softmax(self.fc(x), dim=1)
+        x = self.flatten(x)
+        x = self.fc(x)
         
         return x
     
@@ -61,4 +60,14 @@ class MyAwesomeModel(nn.Module):
         plt.ylabel("Training loss")
         plt.savefig('reports/figures/train_loss.png')
 
-            
+if __name__ == '__main__':
+    # Create model
+    model = MyAwesomeModel()
+
+    # Load data and begin training
+    train_set = torch.load('data/processed/traindata.pt')
+    model.training_loop(1e-3, train_set)
+    
+    # Save model
+    model.save_model("trained_model_Session1.pth")
+    pass
