@@ -14,20 +14,15 @@ def predict(
         Tensor of shape [N, d] where N is the number of samples and d is the output dimension of the model
 
     """
-    state_dict = torch.load(f'MLOps_DTU_project/models/session1/trained_model.pt')
-    model.load_state_dict(state_dict)
-
-    test_set = torch.load("data/processed/testdata.pt")
 
     vali_labels, vali_topclass = [], []
     # turn of gradients
     with torch.no_grad():
         # Dont want dropout in here
-
         model.eval()
 
         # Begin validation
-        for vali_image, vali_label in test_set:
+        for vali_image, vali_label in dataloader:
             ps = torch.exp(model(vali_image))                      # Find the probabilities of the validation set ran through the model
             top_p, top_class = ps.topk(1, dim=1)                    # Find the top probability of each image
 

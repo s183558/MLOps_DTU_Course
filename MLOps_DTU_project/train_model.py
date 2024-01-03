@@ -10,26 +10,29 @@ class MyAwesomeModel(nn.Module):
     def __init__(self):
         super().__init__()
         # Input to a hidden layer
-        self.fc1 = nn.Linear(784, 128)
-        self.fc2 = nn.Linear(128, 64)
-        self.fc3 = nn.Linear(64, 10)
+        self.cnn1 = nn.Conv2d(1, 32, 3)  # [B, 1, 28, 28] -> [B, 32, 26, 26]
+        self.cnn2 = nn.Conv2d(32, 64, 3) # [B, 32, 26, 26] -> [B, 64, 24, 24]
+        self.maxpool2d = nn.MaxPool2d(2)      # [B, 64, 24, 24] -> [B, 64, 12, 12]
+        self.flatten = nn.Flatten()        # [B, 64, 12, 12] -> [B, 64 * 12 * 12]
+        self.fc = nn.Linear(64 * 12 * 12, 10)
 
-        self.dropout = nn.Dropout(p=0.3)
+        self.LRelu = nn.LeakyReLU()
+        #self.dropout = nn.Dropout(p=0.3)
         
     def forward(self, x):
-        # make sure input tensor is flattened
-        x = x.view(x.shape[0], -1)
-        
-        x = self.dropout(F.relu(self.fc1(x)))
-        x = self.dropout(F.relu(self.fc2(x)))
-        x = F.log_softmax(self.fc3(x), dim=1)
+        x = self.LRelu(self.cnn1(x))
+        x = self.LRelu(self.cnn2(x))
+        x = self.maxpool2d(x)
+        x = x.view(x.shape[0], -1) # flatten
+        # x = self.flatten(x)
+        x = F.log_softmax(self.fc(x), dim=1)
         
         return x
     
-    def save_model(self, location):
-        torch.save(self.state_dict(), f'MLOps_DTU_project/models/session1/{location}')
+    def save_model(self, fname):
+        torch.save(self.state_dict(), f'MLOps_DTU_project/models/{fname}')
 
-    def training_loop(self, lr, train_set, epochs = 40):
+    def training_loop(self, lr, train_set, epochs = 5):
         criterion = nn.NLLLoss()
         optimizer = optim.Adam(self.parameters(), lr=lr)
 
@@ -56,6 +59,6 @@ class MyAwesomeModel(nn.Module):
         plt.plot(train_loss)
         plt.xlabel("Epoch")
         plt.ylabel("Training loss")
-        plt.savefig('reports/figures/final_exercise_S1/train_loss.png')
+        plt.savefig('reports/figures/train_loss.png')
 
             

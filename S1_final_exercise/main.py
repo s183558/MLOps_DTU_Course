@@ -26,8 +26,7 @@ def train(lr):
     model.training_loop(lr, train_set)
     
     # Save model
-    #model.save_model("trained_model.pt")
-    torch.save(model.state_dict(), 'trained_model.pt')
+    model.save_model("trained_model_Session1.pt")
 
 
 
