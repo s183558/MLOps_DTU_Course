@@ -23,37 +23,11 @@ def train(lr):
     model = MyAwesomeModel()
     train_set, _ = mnist()
 
-    criterion = nn.NLLLoss()
-    optimizer = optim.Adam(model.parameters(), lr=lr)
-
-    epochs = 40
-
-    train_loss = []
-    for e in range(epochs):
-        running_loss = 0
-        for images, labels in train_set:
-            
-            optimizer.zero_grad()
-            
-            log_ps = model(images)
-            loss = criterion(log_ps, labels)
-            loss.backward()
-            optimizer.step()
-            
-            running_loss += loss.item()
-            
-        else:
-            t_loss = running_loss/len(train_set)
-            train_loss.append(t_loss)
-            print(f"Training loss: {t_loss}")
-
-    plt.plot(train_loss)
-    plt.xlabel("Epoch")
-    plt.ylabel("Training loss")
-    plt.savefig('s1_development_environment/exercise_files/final_exercise/train_loss.png')
-
+    model.training_loop(lr, train_set)
+    
     # Save model
-    torch.save(model.state_dict(), 's1_development_environment/exercise_files/final_exercise/trained_model.pt')
+    #model.save_model("trained_model.pt")
+    torch.save(model.state_dict(), 'trained_model.pt')
 
 
 
