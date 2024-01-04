@@ -1,26 +1,60 @@
 import torch
+from torch import nn, optim
+import matplotlib.pyplot as plt
+import torch.nn.functional as F
 
-class MyNeuralNet(torch.nn.Module):
-    """ Basic neural network class. 
-    
-    Args:
-        in_features: number of input features
-        out_features: number of output features
-    
-    """
-    def __init__(self, in_features: int, out_features: int) -> None:
-        self.l1 = torch.nn.Linear(in_features, 500)
-        self.l2 = torch.nn.Linear(500, out_features)
-        self.r = torch.nn.ReLU()
-    
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the model.
+class MyAwesomeModel(nn.Module):
+    """My awesome model."""
+
+    def __init__(self):
+        super().__init__()
+        # Input to a hidden layer
+        self.cnn1 = nn.Conv2d(1, 32, 3)  # [B, 1, 28, 28] -> [B, 32, 26, 26]
+        self.cnn2 = nn.Conv2d(32, 64, 3) # [B, 32, 26, 26] -> [B, 64, 24, 24]
+        self.maxpool2d = nn.MaxPool2d(2)      # [B, 64, 24, 24] -> [B, 64, 12, 12]
+        self.flatten = nn.Flatten(0, -1)        # [B, 64, 12, 12] -> [B, 64 * 12 * 12]
+        self.fc = nn.Linear(64 * 12 * 12, 10)
+
+        self.LRelu = nn.LeakyReLU()
+        #self.dropout = nn.Dropout(p=0.3)
         
-        Args:
-            x: input tensor expected to be of shape [N,in_features]
+    def forward(self, x):
+        x = self.LRelu(self.cnn1(x))
+        x = self.LRelu(self.cnn2(x))
+        x = self.maxpool2d(x)
+        x = self.flatten(x)
+        x = self.fc(x)
+        
+        return x
+    
+    def save_model(self, fname):
+        torch.save(self.state_dict(), f'MLOps_DTU_project/models/{fname}')
 
-        Returns:
-            Output tensor with shape [N,out_features]
+    def training_loop(self, lr, train_set, epochs = 5):
+        criterion = nn.NLLLoss()
+        optimizer = optim.Adam(self.parameters(), lr=lr)
 
-        """
-        return self.l2(self.r(self.l1(x)))
+        train_loss = []
+        for e in range(epochs):
+            running_loss = 0
+            for images, labels in train_set:
+                
+                optimizer.zero_grad()
+                
+                log_ps = self(images)
+                loss = criterion(log_ps, labels)
+                loss.backward()
+                optimizer.step()
+                
+                running_loss += loss.item()
+                
+            else:
+                t_loss = running_loss/len(train_set)
+                train_loss.append(t_loss)
+                print(f"Training loss: {t_loss}")
+        
+        
+        plt.plot(train_loss)
+        plt.xlabel("Epoch")
+        plt.ylabel("Training loss")
+        plt.savefig('reports/figures/train_loss.png')

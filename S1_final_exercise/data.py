@@ -1,29 +1,57 @@
 import torch
-from torchvision import transforms
 
 def mnist():
     """Return train and test dataloaders for MNIST."""
-    trainset = []
-    testset  = []
-    # Make a tuple where the first elements are the images, and the second are the corresponding targets
+    # Load the 5 parts of the training data
+    train_data, train_labels = [], []
+    for i in range(5):
+        train_data.append(torch.load(f"data/raw/train_images_{i}.pt"))
+        train_labels.append(torch.load(f"data/raw/train_target_{i}.pt"))
+    
+    # Make them into 1 tensor
+    train_data = torch.cat(train_data, dim=0)
+    train_labels = torch.cat(train_labels, dim=0)
 
-    for im, label in zip(torch.load("data/raw/train_images_0.pt"), torch.load("data/raw/train_target_0.pt")):
-        trainset.append((im[None, :, :], label.item()))
-    train = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
+    # Load the test data
+    test_data = torch.load("data/raw/test_images.pt")
+    test_labels = torch.load("data/raw/test_target.pt")
 
-    for im, label in zip(torch.load("data/raw/test_images.pt"), torch.load("data/raw/test_target.pt")):
-        testset.append((im[None, :, :], label.item()))
-    test = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=True)
+    # normalize the images
+    train_data_norm = normalize_tensor(train_data)
+    test_data_norm = normalize_tensor(test_data)
 
-    #train_im = torch.load("data/corruptmnist/train_images_0.pt")
-    #print(f'\nTraining image 0 shape: {train_im[0].shape}\n')
-    #print(f'\nTraining image 1 shape: {train_im[1].shape}\n')
-    #print(f'\nTraining image -1 shape: {train_im[-1].shape}\n')
-    #trainset = zip(torch.load("data/corruptmnist/train_images_0.pt"), torch.load("data/corruptmnist/train_target_0.pt"))
-    #print(f'\nTraining set 0: {trainset[0]}\n')
-    #print(f'\nTraining set -1: {trainset[-1]}\n')
-    #train = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
-    #testset = (torch.load("data/corruptmnist/test_images.pt"), torch.load("data/corruptmnist/test_target.pt"))
-    #test = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=True)
+    # Make the images 3D, with only 1 color channel
+    train_data_norm = train_data_norm.unsqueeze(1)
+    test_data_norm = test_data_norm.unsqueeze(1)
 
-    return train, test
+    # return the images and labels in a tuple
+    return (torch.utils.data.TensorDataset(train_data_norm, train_labels), 
+            torch.utils.data.TensorDataset(test_data_norm, test_labels))
+
+def normalize_tensor(data):
+    # Calculate mean and std along dimensions (1, 2)
+    mean = data.mean(dim=(1, 2), keepdim=True)
+    std = data.std(dim=(1, 2), keepdim=True)
+
+    # Normalize the data
+    normalized_data = (data - mean) / std
+
+    # Check mean and std of normalized_data
+    mean_check = normalized_data.mean(dim=(1, 2))
+    std_check = normalized_data.std(dim=(1, 2))
+
+    # Define a tolerance level
+    tolerance = 1e-6
+
+    # Assert that mean is close to 0 and std is close to 1
+    assert torch.all(torch.abs(mean_check) < tolerance), "Mean check failed!"
+    assert torch.all(torch.abs(std_check - 1) < tolerance), "Std check failed!"
+
+    print("Normalization check passed!")
+    return normalized_data
+
+if __name__ == '__main__':
+    train_data, test_data = mnist()
+
+    torch.save(train_data, "data/processed/traindata.pt")
+    torch.save(test_data, "data/processed/testdata.pt")

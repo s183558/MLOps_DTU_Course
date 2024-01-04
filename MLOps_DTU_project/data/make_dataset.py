@@ -1,5 +1,4 @@
 import torch
-import torchvision
 
 def loadCorrupteMnist():
     """Return train and test dataloaders for MNIST."""
@@ -18,18 +17,16 @@ def loadCorrupteMnist():
     test_labels = torch.load("data/raw/test_target.pt")
 
     # normalize the images
-    train_data_norm = normalize_tensor(train_data)
-    test_data_norm = normalize_tensor(test_data)
+    train_data = normalize_tensor(train_data)
+    test_data = normalize_tensor(test_data)
 
-    # make the images 3D, with only 1 channel
+    # Make the images 3D, with only 1 color channel
     train_data = train_data.unsqueeze(1)
     test_data = test_data.unsqueeze(1)
 
     # return the images and labels in a tuple
-    return (
-        torch.utils.data.TensorDataset(train_data, train_labels), 
-        torch.utils.data.TensorDataset(test_data, test_labels)
-    )
+    return (torch.utils.data.TensorDataset(train_data, train_labels), 
+            torch.utils.data.TensorDataset(test_data, test_labels))
 
 def normalize_tensor(data):
     # Calculate mean and std along dimensions (1, 2)
@@ -51,13 +48,12 @@ def normalize_tensor(data):
     assert torch.all(torch.abs(std_check - 1) < tolerance), "Std check failed!"
 
     print("Normalization check passed!")
-    #print(f"Normalized data mean={normalized_data.mean(dim=(1, 2), keepdim=True)}, std={normalized_data.std(dim=(1, 2), keepdim=True)}")
     return normalized_data
 
 
 if __name__ == '__main__':
     # Get the data and process it
-    train, test = loadCorrupteMnist()
+    train_data, test_data = loadCorrupteMnist()
 
-    torch.save(train, "data/processed/traindata.pt")
-    torch.save(test, "data/processed/testdata.pt")
+    torch.save(train_data, "data/processed/traindata.pt")
+    torch.save(test_data, "data/processed/testdata.pt")

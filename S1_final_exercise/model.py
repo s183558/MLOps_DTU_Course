@@ -1,7 +1,8 @@
 from torch import nn, optim
 import torch
-import torch.nn.functional as F
 import matplotlib.pyplot as plt
+import time 
+import numpy as np
 
 
 class MyAwesomeModel(nn.Module):
@@ -23,40 +24,36 @@ class MyAwesomeModel(nn.Module):
         x = self.LRelu(self.cnn1(x))
         x = self.LRelu(self.cnn2(x))
         x = self.maxpool2d(x)
-        x = x.view(x.shape[0], -1) # flatten
-        # x = self.flatten(x)
-        x = F.log_softmax(self.fc(x), dim=1)
+        x = self.flatten(x)
+        x = self.fc(x)
         
         return x
     
     def save_model(self, fname):
-        torch.save(self.state_dict(), f'MLOps_DTU_project/models/{fname}')
+        torch.save(self.state_dict(), f'MLOps_DTU_project/models/model_checkpoints/{fname}_{time.strftime("%d%m%Y-%H%M%S")}')
 
-    def training_loop(self, lr, train_set, epochs = 5):
-        criterion = nn.NLLLoss()
+    def training_loop(self, lr, train_set, num_epochs = 5):
+        loss_fn = nn.CrossEntropyLoss() 
         optimizer = optim.Adam(self.parameters(), lr=lr)
 
         train_loss = []
-        for e in range(epochs):
-            running_loss = 0
-            for images, labels in train_set:
+        for epoch in range(num_epochs):
+            epoch_start_time = time.time_ns()
+            for x, y in train_set:
                 
                 optimizer.zero_grad()
                 
-                log_ps = self(images)
-                loss = criterion(log_ps, labels)
+                y_pred = self(x)
+                loss = loss_fn(y_pred, y)
                 loss.backward()
                 optimizer.step()
                 
-                running_loss += loss.item()
-                
-            else:
-                t_loss = running_loss/len(train_set)
-                train_loss.append(t_loss)
-                print(f"Training loss: {t_loss}")
-        
-        
+            # after a whole epoch
+            train_loss.append(loss.detach())
+            print(f"Epoch {epoch + 1} took {(time.time_ns() - epoch_start_time) * 10e-10:.2f}sec.\tLoss {loss}\n")
+
         plt.plot(train_loss)
+        plt.yscale("log")
         plt.xlabel("Epoch")
         plt.ylabel("Training loss")
         plt.savefig('reports/figures/train_loss.png')
