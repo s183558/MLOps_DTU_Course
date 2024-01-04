@@ -8,8 +8,9 @@ if __name__ == '__main__':
     # Load data and begin training
     print(f'Beginning to train the model, please wait')
     train_set = torch.load('data/processed/traindata.pt')
-    model.training_loop(1e-3, train_set)
+    train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=256)
+    model.training_loop(1e-3, train_dataloader)
     
     # Save model
-    model.save_model("trained_model_Session1.pth")
+    model.save_model("trained_model_Session1")
 

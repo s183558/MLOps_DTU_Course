@@ -24,7 +24,7 @@ def visualization(model: torch.nn.Module):
 
 if __name__ == "__main__":
     model = MyAwesomeModel()
-    state_dict = torch.load(f'MLOps_DTU_project/models/trained_model_Session1.pth')
+    state_dict = torch.load(f'MLOps_DTU_project/models/dummu_test_chkpt.pth')
     model.load_state_dict(state_dict)
     visualization(model)
 

@@ -2,7 +2,6 @@ from torch import nn, optim
 import torch
 import matplotlib.pyplot as plt
 import time 
-import numpy as np
 
 
 class MyAwesomeModel(nn.Module):
@@ -58,4 +57,20 @@ class MyAwesomeModel(nn.Module):
         plt.ylabel("Training loss")
         plt.savefig('reports/figures/train_loss.png')
 
-            
+    def inference(self, test_dataloader):
+        test_preds, test_labels = [], []
+        # Dont want dropout in here
+        self.eval()
+
+        # Begin validation
+        with torch.no_grad():
+            for x, y in test_dataloader:
+                # x = x.to(device)
+                y_pred = self(x)                                # Find the probabilities of the validation set ran through the model
+                test_preds.append(y_pred.argmax(dim=1).cpu())   # Find the top probability of each image
+                test_labels.append(y)
+
+        test_preds = torch.cat(test_preds, dim=0)
+        test_labels = torch.cat(test_labels, dim=0)
+
+        print(f'Accuracy: {(test_preds == test_labels).float().mean()}')    # Find the percentage of correct "guesses"
