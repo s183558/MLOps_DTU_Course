@@ -1,2 +1,3 @@
-from MLOps_DTU_project.models.model import MyNeuralNet
+from MLOps_DTU_project.models.model import MyAwesomeModel
 from MLOps_DTU_project.predict_model import predict
+from MLOps_DTU_project.data.make_dataset import loadCorrupteMnist, tensor_normalizer
