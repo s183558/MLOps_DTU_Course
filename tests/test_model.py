@@ -1,8 +1,9 @@
+import pytest
 from MLOps_DTU_project import MyAwesomeModel
 import torch
 
-def test_model():
-    batch_size = 256
+@pytest.mark.parametrize("batch_size", [64, 128, 256])
+def test_model(batch_size):
     # Create model
     model = MyAwesomeModel()
 
@@ -14,3 +15,8 @@ def test_model():
     # One training loop of one image
     y_pred = model(x)
     assert y_pred.shape == (batch_size, 10), "Wrong shape of y_pred"
+
+def test_error_on_wrong_shape():
+    model = MyAwesomeModel()
+    with pytest.raises(ValueError, match='Expected input to a 4D tensor'):
+        model(torch.randn(1,2,3))

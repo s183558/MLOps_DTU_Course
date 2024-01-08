@@ -1,4 +1,4 @@
-from torch import nn, optim
+from torch import Tensor, nn, optim
 import torch
 import matplotlib.pyplot as plt
 import time 
@@ -18,7 +18,11 @@ class MyAwesomeModel(nn.Module):
         self.LRelu = nn.LeakyReLU()
         #self.dropout = nn.Dropout(p=0.3)
         
-    def forward(self, x):
+    def forward(self, x : Tensor):
+        if x.ndim != 4:
+            raise ValueError('Expected input to a 4D tensor')
+        if x.shape[1] != 1 or x.shape[2] != 28 or x.shape[3] != 28:
+            raise ValueError('Expected each sample to have shape [1, 28, 28]')
         x = self.LRelu(self.cnn1(x))
         x = self.LRelu(self.cnn2(x))
         x = self.maxpool2d(x)
