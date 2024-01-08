@@ -1,6 +1,6 @@
 import torch
 
-def loadCorrupteMnist():
+def loadCorrupteMnist(normalize_tensor=True):
     """Return train and test dataloaders for MNIST."""
     # Load the 5 parts of the training data
     train_data, train_labels = [], []
@@ -17,8 +17,9 @@ def loadCorrupteMnist():
     test_labels = torch.load("data/raw/test_target.pt")
 
     # normalize the images
-    train_data = normalize_tensor(train_data)
-    test_data = normalize_tensor(test_data)
+    if normalize_tensor:
+        train_data = tensor_normalizer(train_data)
+        test_data = tensor_normalizer(test_data)
 
     # Make the images 3D, with only 1 color channel
     train_data = train_data.unsqueeze(1)
@@ -28,7 +29,7 @@ def loadCorrupteMnist():
     return (torch.utils.data.TensorDataset(train_data, train_labels), 
             torch.utils.data.TensorDataset(test_data, test_labels))
 
-def normalize_tensor(data):
+def tensor_normalizer(data):
     # Calculate mean and std along dimensions (1, 2)
     mean = data.mean(dim=(1, 2), keepdim=True)
     std = data.std(dim=(1, 2), keepdim=True)
