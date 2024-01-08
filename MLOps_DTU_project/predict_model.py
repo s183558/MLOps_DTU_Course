@@ -1,9 +1,9 @@
 import torch
-from models.model import MyAwesomeModel
+from MLOps_DTU_project.models.model import MyAwesomeModel
 import glob
 import os
 
-if __name__ == '__main__':
+def predict():
     # Find the latest file in the folder
     list_of_files = glob.glob('MLOps_DTU_project/models/model_checkpoints/*')
     latest_file = os.path.basename(max(list_of_files, key=os.path.getctime))
@@ -20,4 +20,7 @@ if __name__ == '__main__':
     test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=64, shuffle = False)
 
     model.inference(test_dataloader)
+
+if __name__ == '__main__':
+    predict()
     
