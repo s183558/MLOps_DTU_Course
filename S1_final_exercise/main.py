@@ -29,7 +29,7 @@ def train(lr, batch_size, num_epochs):
     train_dataloader = torch.utils.data.DataLoader(train_set, batch_size=batch_size)
 
     model.training_loop(lr, train_dataloader, num_epochs)
-    
+
     # Save model
     model.save_model("trained_model_Session1.pth")
 
@@ -49,7 +49,7 @@ def evaluate(model_checkpoint):
     test_dataloader = torch.utils.data.DataLoader(test_set, batch_size=64, shuffle = False)
 
     model.inference(test_dataloader)
-    
+
 
 cli.add_command(train)
 cli.add_command(evaluate)

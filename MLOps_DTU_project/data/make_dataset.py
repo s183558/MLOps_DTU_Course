@@ -7,7 +7,7 @@ def loadCorrupteMnist(normalize_tensor=True):
     for i in range(5):
         train_data.append(torch.load(f"data/raw/train_images_{i}.pt"))
         train_labels.append(torch.load(f"data/raw/train_target_{i}.pt"))
-    
+
     # Make them into 1 tensor
     train_data = torch.cat(train_data, dim=0)
     train_labels = torch.cat(train_labels, dim=0)
@@ -26,7 +26,7 @@ def loadCorrupteMnist(normalize_tensor=True):
     test_data = test_data.unsqueeze(1)
 
     # return the images and labels in a tuple
-    return (torch.utils.data.TensorDataset(train_data, train_labels), 
+    return (torch.utils.data.TensorDataset(train_data, train_labels),
             torch.utils.data.TensorDataset(test_data, test_labels))
 
 def tensor_normalizer(data):

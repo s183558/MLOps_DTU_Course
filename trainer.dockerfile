@@ -13,7 +13,7 @@ COPY MLOps_DTU_project/ MLOps_DTU_project/
 COPY data/ data/
 
 # Install all the requirement.
-# We use "--no-cache-dir" to not store the pip downloads, which would make it easier to redownload, but it takes up more space. 
+# We use "--no-cache-dir" to not store the pip downloads, which would make it easier to redownload, but it takes up more space.
 # We want the image to be as small as possible, why we dont want the cache
 WORKDIR /
 RUN pip install . --no-cache-dir #(1)
@@ -21,5 +21,5 @@ RUN pip install . --no-cache-dir #(1)
 # The entrypoint for our docker image. "-u" is to redirect all print()'s to our terminal.
 ENTRYPOINT ["python", "-u", "MLOps_DTU_project/train_model.py"]
 
-# Create the docker image by typing this 
+# Create the docker image by typing this
 # docker build -f trainer.dockerfile . -t trainer:latest
