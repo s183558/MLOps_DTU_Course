@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from torch import nn, optim
 from model import MyAwesomeModel
 import time
-
 from data import mnist
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 @click.group()
