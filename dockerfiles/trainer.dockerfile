@@ -21,5 +21,5 @@ RUN pip install . --no-cache-dir #(1)
 # The entrypoint for our docker image. "-u" is to redirect all print()'s to our terminal.
 ENTRYPOINT ["python", "-u", "MLOps_DTU_project/train_model.py"]
 
-# Create the docker image by typing this 
+# Create the docker image by typing this
 # docker build -f dockerfiles/trainer.dockerfile . -t trainer:latest
