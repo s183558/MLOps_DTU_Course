@@ -22,4 +22,4 @@ RUN pip install . --no-cache-dir #(1)
 ENTRYPOINT ["python", "-u", "MLOps_DTU_project/train_model.py"]
 
 # Create the docker image by typing this 
-# docker build -f trainer.dockerfile . -t trainer:latest
+# docker build -f dockerfiles/trainer.dockerfile . -t trainer:latest
